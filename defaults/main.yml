@@ -1,0 +1,3 @@
+---
+# defaults file for ansible-repo-epel
+epel_enabled: true

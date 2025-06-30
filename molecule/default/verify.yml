@@ -1,0 +1,29 @@
+---
+- name: Verify
+  hosts: all
+  become: false
+  tasks:
+    - name: Check if epel-release package is installed
+      ansible.builtin.package_facts:
+        manager: auto
+      register: package_facts
+
+    - name: Verify epel-release package is installed
+      ansible.builtin.assert:
+        that:
+          - "'epel-release' in ansible_facts.packages"
+        fail_msg: "epel-release package not found in installed packages"
+        success_msg: "epel-release package is properly installed"
+
+    - name: Check if EPEL repository is enabled
+      ansible.builtin.shell: dnf repolist enabled | grep -i epel
+      register: epel_repo_check
+      changed_when: false
+
+    - name: Verify EPEL repository is enabled
+      ansible.builtin.assert:
+        that:
+          - epel_repo_check.rc == 0
+          - epel_repo_check.stdout != ""
+        fail_msg: "EPEL repository is not enabled"
+        success_msg: "EPEL repository is enabled and available"

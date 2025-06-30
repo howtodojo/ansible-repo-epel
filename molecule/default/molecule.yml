@@ -1,0 +1,25 @@
+---
+driver:
+  name: docker
+platforms:
+  - name: instance
+    image: "${MOLECULE_DISTRO:-almalinux:9}"
+    pre_build_image: true
+    command: /bin/bash -c "while true; do sleep 30; done"
+    tmpfs:
+      - /run
+      - /tmp
+provisioner:
+  name: ansible
+  inventory:
+    host_vars:
+      instance:
+        ansible_distribution: "${MOLECULE_ANSIBLE_DISTRIBUTION:-AlmaLinux}"
+        ansible_distribution_release: "${MOLECULE_ANSIBLE_RELEASE:-}"
+        ansible_distribution_major_version: "${MOLECULE_ANSIBLE_VERSION:-9}"
+        ansible_os_family: "${MOLECULE_ANSIBLE_OS_FAMILY:-RedHat}"
+        ansible_connection: docker
+        ansible_user: root
+        ansible_become: false
+verifier:
+  name: ansible

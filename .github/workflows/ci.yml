@@ -1,0 +1,65 @@
+---
+name: CI
+on:
+  pull_request: {}
+  push:
+    branches:
+      - master
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the codebase
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.x"
+
+      - name: Install test dependencies
+        run: |
+          pip3 install ansible ansible-lint yamllint
+          
+      - name: Lint YAML files
+        run: yamllint .
+
+      - name: Lint Ansible files
+        run: ansible-lint
+
+  molecule:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        distro:
+          - almalinux9
+          - rockylinux9
+    steps:
+      - name: Check out the codebase
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.x"
+
+      - name: Install test dependencies
+        run: |
+          pip3 install ansible
+          pip3 install "molecule>=6.0.0"
+          pip3 install "molecule-plugins[docker]>=23.0.0"
+          pip3 install docker
+
+      - name: Set up Molecule working directory
+        run: echo "MOLECULE_PROJECT_DIRECTORY=${{ github.workspace }}" >> $GITHUB_ENV
+
+      - name: Run Molecule tests
+        run: molecule -v test
+        env:
+          PY_COLORS: '1'
+          ANSIBLE_FORCE_COLOR: '1'
+          MOLECULE_DISTRO: ${{ matrix.distro == 'almalinux9' && 'almalinux:9' || matrix.distro == 'rockylinux9' && 'rockylinux:9' || 'almalinux:9' }}
+          MOLECULE_ANSIBLE_DISTRIBUTION: ${{ matrix.distro == 'almalinux9' && 'AlmaLinux' || matrix.distro == 'rockylinux9' && 'Rocky' || 'AlmaLinux' }}
+          MOLECULE_ANSIBLE_RELEASE: ""
+          MOLECULE_ANSIBLE_VERSION: "9"
+          MOLECULE_ANSIBLE_OS_FAMILY: "RedHat"

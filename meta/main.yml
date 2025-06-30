@@ -1,0 +1,22 @@
+---
+galaxy_info:
+    author: Muhammad Panji
+    description: Enable EPEL repository on RHEL-based systems
+    company: howtodojo.com
+    license: BSD
+    min_ansible_version: 2.0
+    github_branch: master
+    role_name: repo_epel
+    namespace: muhammadpanji
+    platforms:
+        - name: EL
+          versions:
+              - 9
+              - 10
+
+    galaxy_tags:
+        - system
+        - repositories
+        - epel
+
+dependencies: []

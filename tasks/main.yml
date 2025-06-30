@@ -1,0 +1,12 @@
+---
+# tasks file for ansible-repo-epel
+
+- name: Install EPEL repository
+  become: true
+  package:
+    name: epel-release
+    state: present
+  when: ansible_os_family == "RedHat"
+  tags:
+    - epel
+    - repositories
